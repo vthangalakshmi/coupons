@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.BeforeTest;
 //import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -17,8 +18,8 @@ public class Coupon_Admin
 	propertyReader pReader;
 	PoModel ap_obj;
     WebElement createButton;
-    Boolean buttonTrue;     
-	@Test(priority=0,testName="Verify the Admin Login")
+    Boolean buttonTrue;  
+    @Test(priority=0,testName="Verify the Admin Login")
 	public void admin_login() throws Exception
 	{
 		pReader=new propertyReader();
@@ -29,13 +30,31 @@ public class Coupon_Admin
 	    Thread.sleep(100);
 	    ap_obj=PageFactory.initElements(driver,PoModel.class);
 	    ap_obj.admin_login(pReader.getUsername(), pReader.getPassword());
-	    WebElement locale=driver.findElement(By.id("interface_locale"));
+	    /*WebElement locale=driver.findElement(By.id("interface_locale"));
 	    Select english=new Select(locale);
 	    english.selectByValue("en_US");
 	    String title=driver.getTitle();	
+	    System.out.println(title);*/ 
+	}
+    @Test(priority=1,testName="Verify the locale_check")
+	public void locale_check() throws Exception
+	{
+		WebElement locale=driver.findElement(By.id("interface_locale"));
+		Boolean default_locale=locale.equals("ja_jp");
+		if(!default_locale)
+		{
+		  Select change_locale=new Select(locale);
+		  change_locale.selectByValue("en_US");
+	      System.out.println("The default locale is Japanese and its changed to English now");
+		}
+		else
+		{
+		  System.out.println("The default locale is english");
+		}
+	    String title=driver.getTitle();	
 	    System.out.println(title); 
 	}
-	@Test(priority=1,testName="Verify the Coupon Landing ")
+	@Test(priority=2,testName="Verify the Coupon Landing ")
 	public void coupon_home() throws Exception
 	{
 		ap_obj.Coupons_grid();
