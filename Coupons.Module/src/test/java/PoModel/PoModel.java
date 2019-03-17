@@ -12,17 +12,25 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
-
+import org.openqa.selenium.support.ui.Select;
 
 public class PoModel
 {
 	WebDriver driver;
 	Actions act;
+	private String validation;
+	String specialChars = "~`!@#$%^&*()-_=+\\|[{]};:'\",<.>/?";
 	@FindBy(how=How.XPATH,using="//*[@id='nav']/li[5]/a/span")
 	WebElement promotionsMenu;
 	
 	@FindBy(how=How.XPATH,using="//*[@id='nav']/li[5]/ul/li/a/span")
 	WebElement couponsSubMenu;
+	
+	@FindBy(how=How.XPATH,using="//*[@id='accountname']")
+	WebElement couponsAccountAttribute;
+	
+	@FindBy(how=How.XPATH,using="//*[@id='maxUser']")
+	WebElement couponsMaxAcc;
 	
 	//admin elements
 	By uname=By.xpath("//*[@id='username']");
@@ -31,6 +39,12 @@ public class PoModel
 	//Coupon screen elements
 	//By couponnew_button=By.xpath("//button[@title='Create New']");
 	By coupon_code_Textbox=By.xpath("//*[@id='couponCode']");
+	By coupon_activation_date=By.xpath("//*[@id='activateDate']");
+	By coupon_expiry_date=By.xpath("//*[@id='expiryDate']");
+	By coupon_amount=By.xpath("//*[@id='amount']");
+	By coupon_max_accounts=By.xpath("//*[@id='maxUser']");
+	//By coupon_accountName=By.xpath("//*[@id='accountname']");
+	By coupon_TandC=By.xpath("//*[@id='termsAndConditions']");
 	
 	//Marketplace elements
 	By mailid=By.id("email");
@@ -95,44 +109,126 @@ public class PoModel
 	}
 	public String Coupons_code_validation(String input) throws Exception
 	{
-		String validation=null;
-		String specialChars = "~`!@#$%^&*()-_=+\\|[{]};:'\",<.>/?";
 		if(input==null||input.isEmpty())
 		{
 			driver.findElement(coupon_code_Textbox).clear();
 			driver.findElement(coupon_code_Textbox).sendKeys(input);
 			driver.findElement(coupon_code_Textbox).submit();
-			//Thread.sleep(2000);
 			validation=driver.findElement(By.xpath("//*[@id='advice-required-entry-couponCode']")).getText();
 		}
-		else if(input.length()>=0 && input.length()<=3)
+		else if((input.length()>=37) || (input.length()<=3))
 		{
 			driver.findElement(coupon_code_Textbox).clear();
 			driver.findElement(coupon_code_Textbox).sendKeys(input);
 			driver.findElement(coupon_code_Textbox).submit();
 			validation=driver.findElement(By.xpath("//*[@id='advice-validate-couponcode-length-couponCode']")).getText();
 		}
-		else if(input.length()>=37)
-		{
-			driver.findElement(coupon_code_Textbox).clear();
-			driver.findElement(coupon_code_Textbox).sendKeys(input);
-			driver.findElement(coupon_code_Textbox).submit();
-			validation=driver.findElement(By.xpath("//*[@id='advice-validate-couponcode-length-couponCode']")).getText();
-		}
-		else if(input.charAt(0)>=0 || input.charAt(0)<=9)
+		else if((input.charAt(0)>=0) || (input.charAt(0)<=9) || (specialChars.contains(String.valueOf(input.charAt(0)))))
 		{
 			driver.findElement(coupon_code_Textbox).clear();
 			driver.findElement(coupon_code_Textbox).sendKeys(input);
 			driver.findElement(coupon_code_Textbox).submit();
 			validation=driver.findElement(By.xpath("//*[@id='advice-validate-code-adm-couponCode']")).getText();
 		}
-		else if((specialChars.contains(String.valueOf(input.charAt(0)))))
+		else if(input.contains(specialChars))
 		{
-			driver.findElement(coupon_code_Textbox).clear();
-			driver.findElement(coupon_code_Textbox).sendKeys(input);
-			driver.findElement(coupon_code_Textbox).submit();
+			driver.findElement(coupon_max_accounts).clear();
+			driver.findElement(coupon_max_accounts).sendKeys(input);
+			driver.findElement(coupon_max_accounts).submit();
 			validation=driver.findElement(By.xpath("//*[@id='advice-validate-code-adm-couponCode']")).getText();
 		}
+		return validation;
+	}
+	public String Coupon_amount_Validation(String input) throws Exception
+	{
+        switch(input)
+        {
+        case "":
+        	driver.findElement(coupon_amount).clear();
+			driver.findElement(coupon_amount).sendKeys(input);
+			driver.findElement(coupon_amount).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-required-entry-amount']")).getText();
+			break;
+        case "Test"	:
+        	driver.findElement(coupon_amount).clear();
+			driver.findElement(coupon_amount).sendKeys(input);
+			driver.findElement(coupon_amount).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
+			break;
+        case "%^&":
+        	driver.findElement(coupon_amount).clear();
+			driver.findElement(coupon_amount).sendKeys(input);
+			driver.findElement(coupon_amount).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
+			break;
+        case "1&*1":
+        	driver.findElement(coupon_amount).clear();
+			driver.findElement(coupon_amount).sendKeys(input);
+			driver.findElement(coupon_amount).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-validate-number-price-amount']")).getText();
+			break;
+        case "0":
+        	driver.findElement(coupon_amount).clear();
+			driver.findElement(coupon_amount).sendKeys(input);
+			driver.findElement(coupon_amount).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
+			break;
+        }
+		return validation;
+	}
+	public String Coupons_Max_Accounts_validation(String input) throws Exception
+	{
+		if(input==null||input.isEmpty())
+		{
+			driver.findElement(coupon_max_accounts).clear();
+			driver.findElement(coupon_max_accounts).sendKeys(input);
+			driver.findElement(coupon_max_accounts).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-required-entry-maxUser']")).getText();
+		}
+		else if(input.contains(specialChars) || input.matches(".*[a-zA-Z]+.*"))
+		{
+			driver.findElement(coupon_max_accounts).clear();
+			driver.findElement(coupon_max_accounts).sendKeys(input);
+			driver.findElement(coupon_max_accounts).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-validate-number-maxUser']")).getText();
+		}
+		return validation;
+	}
+	public String Coupons_TermsAndConditions_validation(String input) throws Exception
+	{
+		if(input==null||input.isEmpty())
+		{
+			driver.findElement(coupon_TandC).clear();
+			driver.findElement(coupon_TandC).sendKeys(input);
+			driver.findElement(coupon_TandC).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-required-entry-termsAndConditions']")).getText();
+		}
+		return validation;
+	}
+	public String Coupons_Accounts(String input) throws Exception
+	{
+		Select sel=new Select(couponsAccountAttribute);
+		sel.selectByVisibleText(input);
+		String validation=couponsMaxAcc.getAttribute("readonly");		
+		return validation;
+	}	
+	public String Coupon_Creation(String CC,String CAD,String CED,int CA,int CMA,String TC) throws Exception
+	{
+		driver.navigate().refresh();
+		driver.findElement(coupon_code_Textbox).sendKeys(CC);
+		driver.findElement(coupon_activation_date).sendKeys(CAD);
+		driver.findElement(coupon_expiry_date).sendKeys(CED);
+		driver.findElement(coupon_amount).sendKeys(CA+"");
+		couponsMaxAcc.sendKeys(CMA+"");
+		driver.findElement(coupon_TandC).sendKeys(TC);
+		driver.findElement(coupon_TandC).submit();
+		Thread.sleep(3000);
+		validation=driver.findElement(By.xpath("//*[@id='messages']/ul/li/ul/li/span")).getText();
+		return validation;
+	}
+	public String Coupon_Creation(String CC,String CAD,String CED,int CA,int CMA,String CAcc,String TC)
+	{
+		
 		return validation;
 	}
 }
