@@ -67,7 +67,7 @@ public class PoModel
 		this.driver=driver;
 		act=new Actions(driver);
 	}
-	public void admin_login(String email,String pword)
+	public void adminLogin(String email,String pword)
 	{
 		driver.findElement(uname).sendKeys(email);
 		driver.findElement(pWord).sendKeys(pword);
@@ -89,11 +89,11 @@ public class PoModel
 		
 		return path;
 	}
-	public void Coupons_grid()
+	public void couponsGrid()
 	{
 		act.moveToElement(promotionsMenu).click(couponsSubMenu).build().perform();
 	}
-	public void mp_login(String email,String pwd) 
+	public void mpLogin(String email,String pwd) 
 	{
 		act.moveToElement(accountlink).click(loginlink).build().perform();
 		String login_title=driver.getTitle();	
@@ -103,11 +103,11 @@ public class PoModel
 		driver.findElement(mailid).submit();
 		
 	}	
-	public void logout()
+	public void logOut()
 	{
 		act.moveToElement(accountHeader).click(logOut).build().perform();
 	}
-	public String Coupons_code_validation(String input) throws Exception
+	public String couponsCodeValidation(String input) throws Exception
 	{
 		if(input==null||input.isEmpty())
 		{
@@ -139,44 +139,47 @@ public class PoModel
 		}
 		return validation;
 	}
-	public String Coupon_amount_Validation(String input) throws Exception
+	public String couponAmountValidation(String input) throws Exception
 	{
-        switch(input)
-        {
-        case "":
-        	driver.findElement(coupon_amount).clear();
+		if(input==null||input.isEmpty())
+		{
+           	driver.findElement(coupon_amount).clear();
 			driver.findElement(coupon_amount).sendKeys(input);
 			driver.findElement(coupon_amount).submit();
 			validation=driver.findElement(By.xpath("//*[@id='advice-required-entry-amount']")).getText();
-			break;
-        case "Test"	:
-        	driver.findElement(coupon_amount).clear();
-			driver.findElement(coupon_amount).sendKeys(input);
-			driver.findElement(coupon_amount).submit();
-			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
-			break;
-        case "%^&":
-        	driver.findElement(coupon_amount).clear();
-			driver.findElement(coupon_amount).sendKeys(input);
-			driver.findElement(coupon_amount).submit();
-			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
-			break;
-        case "1&*1":
-        	driver.findElement(coupon_amount).clear();
+		}
+		else if((input.charAt(0)>=0) && input.matches(".*[a-zA-Z]+.*"))
+		{
+            driver.findElement(coupon_amount).clear();
 			driver.findElement(coupon_amount).sendKeys(input);
 			driver.findElement(coupon_amount).submit();
 			validation=driver.findElement(By.xpath("//*[@id='advice-validate-number-price-amount']")).getText();
-			break;
-        case "0":
+		}
+		/*else if(input.contains(specialChars))
+		{
         	driver.findElement(coupon_amount).clear();
 			driver.findElement(coupon_amount).sendKeys(input);
 			driver.findElement(coupon_amount).submit();
 			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
-			break;
-        }
+		}*/
+		else if((input.contains(specialChars)) || (input.matches(".*[a-zA-Z]+.*")))
+		{
+        	driver.findElement(coupon_amount).clear();
+			driver.findElement(coupon_amount).sendKeys(input);
+			driver.findElement(coupon_amount).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
+		}
+		else if(input.equals("0"))
+		{
+			driver.findElement(coupon_amount).clear();
+			driver.findElement(coupon_amount).sendKeys(input);
+			driver.findElement(coupon_amount).submit();
+			validation=driver.findElement(By.xpath("//*[@id='advice-validate-greater-than-zero-amount']")).getText();
+		}
+		
 		return validation;
 	}
-	public String Coupons_Max_Accounts_validation(String input) throws Exception
+	public String couponsMaxAccountsValidation(String input) throws Exception
 	{
 		if(input==null||input.isEmpty())
 		{
@@ -194,7 +197,7 @@ public class PoModel
 		}
 		return validation;
 	}
-	public String Coupons_TermsAndConditions_validation(String input) throws Exception
+	public String couponsTermsAndConditionsValidation(String input) throws Exception
 	{
 		if(input==null||input.isEmpty())
 		{
@@ -205,14 +208,14 @@ public class PoModel
 		}
 		return validation;
 	}
-	public String Coupons_Accounts(String input) throws Exception
+	public String couponsAccounts(String input) throws Exception
 	{
 		Select sel=new Select(couponsAccountAttribute);
 		sel.selectByVisibleText(input);
 		String validation=couponsMaxAcc.getAttribute("readonly");		
 		return validation;
 	}	
-	public String Coupon_Creation(String CC,String CAD,String CED,int CA,int CMA,String TC) throws Exception
+	public String couponCreation(String CC,String CAD,String CED,int CA,int CMA,String TC) throws Exception
 	{
 		driver.navigate().refresh();
 		driver.findElement(coupon_code_Textbox).sendKeys(CC);
@@ -226,7 +229,7 @@ public class PoModel
 		validation=driver.findElement(By.xpath("//*[@id='messages']/ul/li/ul/li/span")).getText();
 		return validation;
 	}
-	public String Coupon_Creation(String CC,String CAD,String CED,int CA,int CMA,String CAcc,String TC)
+	public String couponCreation(String CC,String CAD,String CED,int CA,int CMA,String CAcc,String TC)
 	{
 		
 		return validation;
